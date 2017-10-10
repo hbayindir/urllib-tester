@@ -72,9 +72,12 @@ if __name__ == '__main__':
 
     localLogger.debug ('Parsed arguments are %s', arguments)
 
-    try:
-        response = urllib2.urlopen(arguments.ADDRESS[0])
-        logging.info ('The request for %s has returned %s.', arguments.ADDRESS[0], response.code)
-    except ValueError as exception:
-        print (exception)
-        sys.exit (2)
+    for address in arguments.ADDRESS:
+        try:
+            response = urllib2.urlopen(address)
+            localLogger.info ('The request for %s has returned %s.', address, response.code)
+        except ValueError as exception:
+            localLogger.critical ("URL type for %s is unknown. Missing http(s)://?", address)
+            sys.exit (2)
+        except urllib2.HTTPError as exception:
+            localLogger.warning ('The request for %s has returned %s.', address, exception.code)
